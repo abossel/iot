@@ -1,0 +1,49 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# All Vagrant configuration is done below. The "2" in Vagrant.configure
+# configures the configuration version (we support older styles for
+# backwards compatibility). Please don't change it unless you know what
+# you're doing.
+Vagrant.configure("2") do |config|
+  # The most common configuration options are documented and commented below.
+  # For a complete reference, please see the online documentation at
+  # https://docs.vagrantup.com.
+
+  # Every Vagrant development environment requires a box. You can search for
+  # boxes at https://vagrantcloud.com/search.
+  config.vm.box = "generic/alpine319"
+  config.vm.provider "virtualbox" do |v|
+    v.memory = 1024
+    v.cpus = 1
+  end
+
+  config.vm.define "abosselS" do |server|
+    server.vm.hostname = "abosselS"
+    server.vm.network "private_network", ip: "192.168.56.110"
+    server.vm.synced_folder ".", "/vagrant"
+    server.vm.provider "virtualbox" do |v|
+      v.name = "abosselS"
+    end
+    server.vm.provision :shell, inline: <<-SHELL
+      echo Start k3s...
+      curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--flannel-iface eth1" sh -
+
+      echo Wait for k3s token...
+      while [ ! -f /var/lib/rancher/k3s/server/node-token ]; do sleep 1; done; sleep 1
+      cp /var/lib/rancher/k3s/server/node-token /vagrant
+    SHELL
+  end
+
+  config.vm.define "abosselSW" do |worker|
+    worker.vm.hostname = "abosselSW"
+    worker.vm.network "private_network", ip: "192.168.56.111"
+    worker.vm.synced_folder ".", "/vagrant"
+    worker.vm.provider "virtualbox" do |v|
+      v.name = "abosselSW"
+    end
+    worker.vm.provision :shell, inline: <<-SHELL
+      curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--flannel-iface eth1" K3S_URL=https://192.168.56.110:6443 K3S_TOKEN=`cat /vagrant/node-token` sh -
+    SHELL
+  end
+end

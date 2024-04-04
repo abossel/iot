@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-one
+  labels:
+    app: app-one
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app-one
+  template:
+    metadata:
+      labels:
+        app: app-one
+    spec:
+      containers:
+      - name: app-one
+        image: nginx
+        ports:
+        - containerPort: 80
+        volumeMounts:
+          - name: app-one-volume
+            mountPath: /usr/share/nginx/html
+      volumes:
+      - name: app-one-volume
+        configMap:
+          name: app-one-configmap
