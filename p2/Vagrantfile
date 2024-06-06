@@ -48,6 +48,8 @@ Vagrant.configure("2") do |config|
       kubectl apply -f /vagrant/conf/app3-service.yaml
 
       kubectl apply -f /vagrant/conf/ingress.yaml
+
+      echo "alias k='k3s kubectl'" >> /home/vagrant/.bashrc >> /home/vagrant/.bash_profile
     SHELL
   end
 end
