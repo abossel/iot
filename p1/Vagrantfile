@@ -27,11 +27,12 @@ Vagrant.configure("2") do |config|
     end
     server.vm.provision :shell, inline: <<-SHELL
       echo Start k3s...
-      curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--flannel-iface eth1" sh -
+      curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--write-kubeconfig-mode=644 --flannel-iface eth1" sh -
 
       echo Wait for k3s token...
       while [ ! -f /var/lib/rancher/k3s/server/node-token ]; do sleep 1; done; sleep 1
       cp /var/lib/rancher/k3s/server/node-token /vagrant
+      echo "alias k='k3s kubectl'" >> /home/vagrant/.bashrc >> /home/vagrant/.bash_profile
     SHELL
   end
 
