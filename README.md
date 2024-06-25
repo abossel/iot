@@ -30,3 +30,5 @@ mv ./kubectl ~/.local/bin/kubectl
 
 
 https://forum.gitlab.com/t/installing-gitlab-on-local-kubernetes-cluster/66935
+
+kubectl -n gitlab patch svc gitlab-nginx-ingress-controller -p '{"spec": {"type": "NodePort"}}'

@@ -22,7 +22,7 @@ fi
 echo "Cluster '$cluster_name' not found."
 
 message "Creating cluster..."
-k3d cluster create $cluster_name
+k3d cluster create $cluster_name --api-port 6550 -p "8081:80@loadbalancer" --agents 2
 
 message "Creating argocd namespace..."
 kubectl create ns argocd
